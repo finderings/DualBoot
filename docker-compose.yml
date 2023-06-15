@@ -22,7 +22,7 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
 
   db:
-    image: postgres:11.4
+    image: postgres:14.8
     ports:
       - 5432:5432
     environment:
