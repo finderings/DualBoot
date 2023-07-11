@@ -1,10 +1,32 @@
 import socket
 from threading import Thread
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+console_handler = logging.StreamHandler()
+logger.addHandler(console_handler)
+formatter = logging.Formatter("%(asctime)s - %(message)s")
+console_handler.setFormatter(formatter)
+
 
 HOST = "127.0.0.1"
 PORT = 12345
 users = {}
 addresses = {}
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind((HOST, PORT))
+s.listen()
+
+
+def incoming_connection():
+    while True:
+        conn, address = s.accept()
+        logger.info("%s:%s Join chat" % address)
+        conn.send(bytes("Hello! Enter your name", "utf-8"))
+        addresses[conn] = address
+        Thread(target=new_user, args=(conn,)).start()
 
 
 def new_user(connection: socket.socket) -> None:
@@ -41,7 +63,7 @@ def remove(connection):
     del users[connection]
     del addresses[connection]
     send_message(bytes(f"{name} left chat", "utf-8"))
-    print(f"{name} left chat")
+    logger.info(f"{name} left chat")
 
 
 def send_message(message, name="", connection=None):
@@ -49,15 +71,9 @@ def send_message(message, name="", connection=None):
         if usr != connection:
             usr.send(bytes(name, "utf-8") + message)
     if connection is not None:
-        print(f'{addresses[connection][0]} {name}{message.decode("utf-8")}')
+        logger.info(f"{addresses[connection][0]} {name}"
+                    f'{message.decode("utf-8")}')
 
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST, PORT))
-    s.listen()
-    while True:
-        conn, address = s.accept()
-        print("%s:%s Join chat" % address)
-        conn.send(bytes("Hello! Enter your name", "utf-8"))
-        addresses[conn] = address
-        Thread(target=new_user, args=(conn,)).start()
+incoming_thread = Thread(target=incoming_connection)
+incoming_thread.start()

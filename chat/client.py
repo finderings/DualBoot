@@ -32,10 +32,9 @@ def send():
             break
 
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.connect((HOST, PORT))
-    receive_thread = Thread(target=receive)
-    send_thread = Thread(target=send)
-    receive_thread.start()
-    send_thread.start()
-    send_thread.join()
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((HOST, PORT))
+receive_thread = Thread(target=receive)
+send_thread = Thread(target=send)
+receive_thread.start()
+send_thread.start()
