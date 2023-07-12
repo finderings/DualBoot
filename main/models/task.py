@@ -17,14 +17,12 @@ class Task(models.Model):
     description = models.CharField(max_length=255)
     date_created = models.DateTimeField(auto_now_add=True)
     date_changed = models.DateTimeField(auto_now=True)
-    final_date = models.DateTimeField(auto_now=True)
+    final_date = models.DateTimeField(blank=True, null=True)
     status = models.CharField(
         max_length=255, default=Status.NEW_TASK, choices=Status.choices
     )
     priority = models.CharField(max_length=255)
-    author = models.ForeignKey(
-        User, on_delete=models.DO_NOTHING, related_name="author"
-    )
+    author = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="author")
     performer = models.ForeignKey(
         User, on_delete=models.DO_NOTHING, related_name="performer"
     )
