@@ -22,8 +22,13 @@ class Task(models.Model):
         max_length=255, default=Status.NEW_TASK, choices=Status.choices
     )
     priority = models.CharField(max_length=255)
-    author = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="author")
+    author = models.ForeignKey(
+        User, on_delete=models.DO_NOTHING, related_name="author"
+    )
     performer = models.ForeignKey(
         User, on_delete=models.DO_NOTHING, related_name="performer"
     )
     tags = models.ManyToManyField(Tag)
+
+    def __str__(self):
+        return self.title
