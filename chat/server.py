@@ -75,5 +75,4 @@ def send_message(message, name="", connection=None):
                     f'{message.decode("utf-8")}')
 
 
-incoming_thread = Thread(target=incoming_connection)
-incoming_thread.start()
+incoming_connection()
