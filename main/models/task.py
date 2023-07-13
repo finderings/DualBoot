@@ -23,10 +23,16 @@ class Task(models.Model):
     )
     priority = models.CharField(max_length=255)
     author = models.ForeignKey(
-        User, on_delete=models.DO_NOTHING, related_name="author"
+        User,
+        on_delete=models.DO_NOTHING,
+        related_name="author",
+        null = True
     )
     performer = models.ForeignKey(
-        User, on_delete=models.DO_NOTHING, related_name="performer"
+        User,
+        on_delete=models.DO_NOTHING,
+        related_name="performer",
+        null = True
     )
     tags = models.ManyToManyField(Tag)
 
