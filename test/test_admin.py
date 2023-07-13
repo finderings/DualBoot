@@ -15,10 +15,10 @@ class TestAdmin(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         super().setUpTestData()
-        cls.admin = User.objects.create_superuser("test@test.ru", email=None, password=None)
+        cls.admin = User.objects.create_superuser(
+            "test@test.ru", email=None, password=None)
         cls.client = APIClient()
         cls.client.force_login(cls.admin)
-
 
     @classmethod
     def assert_forms(
@@ -29,10 +29,13 @@ class TestAdmin(APITestCase):
 
         actions = {"changelist": [], "add": [], "change": (key,)}
         if check_actions:
-            actions = {key: val for key, val in actions.items() if key in check_actions}
+            actions = {key: val for key,
+                       val in actions.items() if key in check_actions}
 
         for action, args in actions.items():
-            url = reverse(f"admin:{app_label}_{model_name}_{action}", args=args)
+            url = reverse(
+                f"admin:{app_label}_{model_name}_{action}", args=args
+                )
             response = cls.client.get(url)
             assert response.status_code == HTTPStatus.OK, response.content
 
@@ -46,4 +49,3 @@ class TestAdmin(APITestCase):
     def test_task(self) -> None:
         task = Task.objects.create()
         self.assert_forms(Task, task.id)
-
