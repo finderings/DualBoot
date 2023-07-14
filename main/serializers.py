@@ -9,18 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'username', 'first_name', 'last_name',
             'email', 'date_of_birth', 'phone'
             )
-        
-
-class StatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        Status = Task.Status
-        model = Status
-        fields = (
-            'NEW_TASK', 'IN_DEVELOMENT', 'ARCHIVED',
-            'IN_QA', 'IN_CODE_REvIEW',
-            'READY_FOR_RELEASE', 'RELEASED'
-        )
-    
+            
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,7 +18,6 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerilizer):
-    status = StatusSerializer()
     author = UserSerializer()
     performer = UserSerializer()
     tags = TagSerializer()
