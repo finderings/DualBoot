@@ -7,11 +7,11 @@ from .serializers import UserSerializer, TagSerializer, TaskSerializer
 
 
 class UserFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(lookup_expr="icontains")
+    username = django_filters.CharFilter(lookup_expr="icontains")
 
     class Meta:
         model = User
-        fields = ("name",)
+        fields = ("username",)
 
 
 class TagFilter(django_filters.FilterSet):
