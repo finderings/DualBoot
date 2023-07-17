@@ -1,7 +1,7 @@
-__pycache__/
 .DS_Store
 __pycache__/**
-task_manager/__pycache__/__init__.cpython-39.pyc
-task_manager/__pycache__/settings.cpython-39.pyc
-task_manager/__pycache__/urls.cpython-39.pyc
-task_manager/__pycache__/wsgi.cpython-39.pyc
+task_manager/__pycache__/**
+main/__pycache__/**
+main/migrations/__pycache__/**
+main/models/__pycache__/**
+test/__pycache__/**
