@@ -15,7 +15,6 @@ HOST = "127.0.0.1"
 PORT = 12345
 users = {}
 addresses = {}
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
 def incoming_connection():
@@ -74,6 +73,7 @@ def send_message(message, name="", connection=None):
 
 
 if __name__ == "__main__":
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((HOST, PORT))
     s.listen()
     incoming_connection()
