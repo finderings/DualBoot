@@ -5,12 +5,28 @@ from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
 from main.models import User
+from factory.django import DjangoModelFactory
+from factory import PostGenerationMethodCall, Faker
+
+
+class UserFactory(DjangoModelFactory):
+    username = Faker("user_name")
+    password = PostGenerationMethodCall("set_password", "password")
+
+    class Meta:
+        model = User
+
+
+class SuperUserFactory(UserFactory):
+    is_staff = True
 
 
 class TestViewSetBase(APITestCase):
-    user: User = None
+    user: UserFactory = None
     client: APIClient = None
     basename: str
+    token_url = reverse("token_obtain_pair")
+    refresh_token_url = reverse("token_refresh")
 
     @classmethod
     def setUpTestData(cls) -> None:
@@ -20,17 +36,17 @@ class TestViewSetBase(APITestCase):
         cls.client = APIClient()
 
     def setUp(self) -> None:
-        self.client.force_login(self.admin)
+        super().setUp()
+        token = self.token_request(self.user.username)
+        self.client.force_authenticate(user=self.admin, token=token)
 
     @classmethod
     def create_api_user(cls):
-        return User.objects.create(username="user@test.ru")
+        return UserFactory.create()
 
     @classmethod
     def create_api_admin(cls):
-        return User.objects.create_superuser(
-            "admin@test.ru", email=None, password=None
-            )
+        return SuperUserFactory.create()
 
     @classmethod
     def detail_url(cls, key: Union[int, str]) -> str:
@@ -71,6 +87,25 @@ class TestViewSetBase(APITestCase):
         return response.data
 
     def check_authorization(self, key: Union[str, int]) -> None:
+        self.client.force_authenticate(user=None)
         response = self.client.get(self.detail_url(key))
-        assert response.status_code == HTTPStatus.FORBIDDEN, response.content
+        assert response.status_code == HTTPStatus.UNAUTHORIZED
         return response.data
+
+    def token_request(self, username: str = None, password: str = "password"):
+        client = self.client_class()
+        if not username:
+            username = self.create_api_user().username
+        return client.post(
+            self.token_url, data={"username": username, "password": password}
+            )
+
+    def refresh_token_request(self, refresh_token: str):
+        client = self.client_class()
+        return client.post(
+            self.refresh_token_url, data={"refresh": refresh_token}
+            )
+
+    def get_refresh_token(self):
+        response = self.token_request()
+        return response.json()["refresh"]
