@@ -45,5 +45,4 @@ class TestTagViewSet(TestViewSetBase):
 
     def test_unauthorized(self):
         tag = self.create(self.tag_attributes)
-        self.client.logout()
         self.check_authorization(tag["id"])
