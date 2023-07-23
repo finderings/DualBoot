@@ -1,6 +1,10 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from factory import PostGenerationMethodCall
+from factory.django import DjangoModelFactory
+from faker import Faker
+
 
 class User(AbstractUser):
     class Roles(models.TextChoices):
