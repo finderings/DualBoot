@@ -87,5 +87,4 @@ class TestTaskViewSet(TestViewSetBase):
 
     def test_unauthorized(self):
         task = self.create(self.task_attributes)
-        self.client.logout()
         self.check_authorization(task["id"])

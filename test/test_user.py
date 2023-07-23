@@ -8,6 +8,8 @@ class TestUserViewSet(TestViewSetBase):
         "first_name": "John",
         "last_name": "Smith",
         "email": "john@test.com",
+        "date_of_birth": "1990-01-01",
+        "phone": "+33211234545"
     }
 
     @staticmethod
@@ -47,5 +49,4 @@ class TestUserViewSet(TestViewSetBase):
 
     def test_unauthorized(self):
         user = self.create(self.user_attributes)
-        self.client.logout()
         self.check_authorization(user["id"])
