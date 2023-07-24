@@ -3,46 +3,61 @@ from test.base import TestViewSetBase
 
 class TestTagViewSet(TestViewSetBase):
     basename = "tags"
-    tag_attributes = {"title": "test", }
+    tag_attributes = {"title": "test"}
+    another_tag_attributes = {"title": "new_title"}
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.tag = self.create(self.tag_attributes)
 
     @staticmethod
     def expected_details(entity: dict, attributes: dict):
         return {**attributes, "id": entity["id"]}
 
     def test_create(self):
-        tag = self.create(self.tag_attributes)
-        expected_response = self.expected_details(tag, self.tag_attributes)
-        assert tag == expected_response
+        expected_response = self.expected_details(
+            self.tag, self.tag_attributes
+            )
+
+        assert self.tag == expected_response
 
     def test_delete(self):
-        tag = self.create(self.tag_attributes)
-        deleted_tag = self.delete(tag["id"])
+        deleted_tag = self.delete(self.tag["id"])
+
         assert deleted_tag == None
 
     def test_retrieve(self):
-        tag = self.create(self.tag_attributes)
-        retrieved_data = self.retrieve(tag["id"])
-        assert tag == retrieved_data
+        retrieved_data = self.retrieve(self.tag["id"])
+
+        assert self.tag == retrieved_data
 
     def test_update(self):
-        tag = self.create(self.tag_attributes)
-        updated_title = {"title": "new_test"}
-        updated_data = self.update(updated_title, key=tag["id"])
-        assert updated_data["title"] == "new_test"
+        updated_data = self.update(
+            self.another_tag_attributes, key=self.tag["id"]
+            )
+
+        assert updated_data["title"] == "new_title"
 
     def test_list(self):
-        second_tag = {"title": "new_test", }
-        self.create(self.tag_attributes)
-        self.create(second_tag)
+        self.create(self.another_tag_attributes)
+
         data = self.list()
+
         assert len(data) == 2
 
     def test_filter(self):
-        tag = self.create(self.tag_attributes)
+        wrong_tag = self.create(self.another_tag_attributes)
         data = self.filter({"title": "test"})
-        expected_response = self.expected_details(tag, self.tag_attributes)
-        assert expected_response in data
+
+        expected_response_match = self.expected_details(
+            self.tag, self.tag_attributes
+            )
+        expected_response_no_match = self.expected_details(
+            wrong_tag, self.another_tag_attributes
+            )
+
+        assert expected_response_match in data
+        assert expected_response_no_match not in data
 
     def test_unauthorized(self):
-        tag = self.create(self.tag_attributes)
-        self.check_authorization(tag["id"])
+        self.check_authorization(self.tag["id"])
