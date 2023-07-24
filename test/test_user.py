@@ -11,42 +11,65 @@ class TestUserViewSet(TestViewSetBase):
         "date_of_birth": "1990-01-01",
         "phone": "+33211234545"
     }
+    another_user_attributes = {
+        "username": "Jimsmith",
+        "first_name": "Jim",
+        "last_name": "Smith",
+        "email": "john@test.com",
+        "date_of_birth": "1990-01-01",
+        "phone": "+33211234545"
+    }
+    
+    def setUp(self) -> None:
+        super().setUp()
+        self.user = self.create(self.user_attributes)
 
     @staticmethod
     def expected_details(entity: dict, attributes: dict):
         return {**attributes, "id": entity["id"]}
 
     def test_create(self):
-        user = self.create(self.user_attributes)
-        expected_response = self.expected_details(user, self.user_attributes)
-        assert user == expected_response
+        expected_response = self.expected_details(
+            self.user, self.user_attributes
+            )
+
+        assert self.user == expected_response
 
     def test_delete(self):
-        user = self.create(self.user_attributes)
-        deleted_user = self.delete(user["id"])
+        deleted_user = self.delete(self.user["id"])
+
         assert deleted_user == None
 
     def test_retrieve(self):
-        user = self.create(self.user_attributes)
-        retrieved_data = self.retrieve(user["id"])
-        assert user == retrieved_data
+        retrieved_data = self.retrieve(self.user["id"])
+
+        assert self.user == retrieved_data
 
     def test_update(self):
-        user = self.create(self.user_attributes)
-        updated_user = {"first_name": "Valera", "username": user["username"]}
-        updated_data = self.update(updated_user, key=user["id"])
-        assert updated_data["first_name"] == "Valera"
+        updated_data = self.update(
+            self.another_user_attributes, key=self.user["id"]
+            )
+
+        assert updated_data["first_name"] == "Jim"
 
     def test_list(self):
         data = self.list()
-        assert len(data) == 2
+
+        assert len(data) == 3
 
     def test_filter(self):
-        user = self.create(self.user_attributes)
+        wrong_user = self.create(self.another_user_attributes)
         data = self.filter({"username": "john"})
-        expected_response = self.expected_details(user, self.user_attributes)
-        assert expected_response in data
+
+        expected_response_match = self.expected_details(
+            self.user, self.user_attributes
+            )
+        expected_response_no_match = self.expected_details(
+            wrong_user, self.another_user_attributes
+            )
+
+        assert expected_response_match in data
+        assert expected_response_no_match not in data
 
     def test_unauthorized(self):
-        user = self.create(self.user_attributes)
-        self.check_authorization(user["id"])
+        self.check_authorization(self.user["id"])

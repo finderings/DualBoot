@@ -40,10 +40,12 @@ class TestPerm(APITestCase):
     def test_isdelete_permission_user(self) -> None:
         token = self.token_request(self.user.username)
         self.client.force_authenticate(user=self.user, token=token)
+
         self.assert_methods_status("get", HTTPStatus.OK)
         self.assert_methods_status("delete", HTTPStatus.FORBIDDEN)
 
     def test_isdelete_permisiion_admin(self) -> None:
         token = self.token_request(self.admin.username)
         self.client.force_authenticate(user=self.admin, token=token)
+        
         self.assert_methods_status("delete", HTTPStatus.NO_CONTENT)
