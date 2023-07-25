@@ -1,0 +1,3 @@
+[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Ffinderings%2FDualBoot%2Fbadge%3Fref%3Ddevelop&style=flat)](https://actions-badge.atrox.dev/finderings/DualBoot/goto?ref=develop)
+
+[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Ffinderings%2FDualBoot%2Fbadge%3Fref%3Dfeature%252Fapi_tests&style=flat)](https://actions-badge.atrox.dev/finderings/DualBoot/goto?ref=feature%2Fapi_tests)
