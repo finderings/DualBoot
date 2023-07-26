@@ -27,7 +27,7 @@ jobs:
         uses: AndreMiras/coveralls-python-action@develop
         with:
           parallel: true
-          base-path: test
+          debug: true
 
   coveralls_finish:
     needs: build
@@ -37,3 +37,4 @@ jobs:
       uses: AndreMiras/coveralls-python-action@develop
       with:
         parallel: true
+        debug: true
