@@ -10,9 +10,6 @@ on:
       - 'develop'
       - 'feature/**'
 
-env:
-  COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,6 +18,7 @@ jobs:
       - uses: actions/setup-python@v1
       - name: Run tests
         env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
           COVERAGE: true
           DJANGO_ENV: dev
         run: docker-compose --file docker-compose.ci.yml run --rm api make test
@@ -29,8 +27,7 @@ jobs:
         uses: AndreMiras/coveralls-python-action@develop
         with:
           parallel: true
-          flag-name: Run tests
-          base-path: 'test'
+          base-path: test
 
   coveralls_finish:
     needs: build
