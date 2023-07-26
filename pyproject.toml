@@ -14,7 +14,7 @@ drf-yasg = "^1.21.6"
 coreapi = "^2.3.3"
 djangorestframework-simplejwt = "^5.2.2"
 factory-boy = "^3.3.0"
-coverage = "^7.2.7"
+coveralls = "^3.3.1"
 
 [tool.poetry.dev-dependencies]
 
@@ -23,7 +23,6 @@ black = "^23.7.0"
 pytest-django = "^4.5.2"
 factory-boy = "^3.3.0"
 freezegun = "^1.2.2"
-coverage = "^7.2.7"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
