@@ -11,6 +11,7 @@ services:
       - 8000:8000
     depends_on:
       - db
+      - agent
     environment: &api-environment
       DJANGO_ENV: dev
       DJANGO_SECRET_KEY: secret_key
@@ -19,7 +20,7 @@ services:
       DATABASE_PASSWORD: postgres
       DATABASE_HOST: db
       DATABASE_PORT: 5432
-    command: python manage.py runserver 0.0.0.0:8000
+    command: newrelic-admin run-program python manage.py runserver 0.0.0.0:8000
 
   db:
     image: postgres:14.8
@@ -28,3 +29,18 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+
+  agent:
+    container_name: relic-infra
+    image: newrelic/infrastructure:latest
+    cap_add:
+      - SYS_PTRACE
+    network_mode: host
+    pid: host
+    privileged: true
+    volumes:
+      - "/:/localhost:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      NRIA_LICENSE_KEY: eu01xxf50860d50d2c3cf38b2cebccf322beNRAL
+    restart: unless-stopped
