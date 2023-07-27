@@ -1,6 +1,6 @@
 from django.urls import path, include, re_path
 from main.admin import task_manager_admin_site
-from main.views import UserViewSet, TaskViewSet, TagViewSet, index
+from main.views import UserViewSet, TaskViewSet, TagViewSet
 
 from rest_framework import permissions, routers
 
@@ -56,5 +56,4 @@ urlpatterns = [
     path('api/token/refresh/',
          TokenRefreshView.as_view(),
          name='token_refresh'),
-    path("index/", index),
 ]
