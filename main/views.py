@@ -6,6 +6,14 @@ from .models import Task, Tag, User
 from .serializers import UserSerializer, TagSerializer, TaskSerializer
 from .permissions import IsStaffDelete
 
+from django.http import HttpResponse
+
+
+def index(request):
+    a = None
+    a.hello()
+    return HttpResponse("Hello, world. You're at the pollapp index.")
+
 
 class UserFilter(django_filters.FilterSet):
     username = django_filters.CharFilter(lookup_expr="icontains")
