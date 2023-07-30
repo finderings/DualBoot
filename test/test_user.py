@@ -1,37 +1,31 @@
 from test.base import TestViewSetBase
+import factory
+from test.fixtures.factories.user import UserFactory
 
 
 class TestUserViewSet(TestViewSetBase):
     basename = "users"
-    user_attributes = {
-        "username": "johnsmith",
-        "first_name": "John",
-        "last_name": "Smith",
-        "email": "john@test.com",
-        "date_of_birth": "1990-01-01",
-        "phone": "+33211234545"
-    }
-    another_user_attributes = {
-        "username": "Jimsmith",
-        "first_name": "Jim",
-        "last_name": "Smith",
-        "email": "john@test.com",
-        "date_of_birth": "1990-01-01",
-        "phone": "+33211234545"
-    }
+    user_attributes = factory.build(dict, FACTORY_CLASS=UserFactory)
+    another_user_attributes = factory.build(dict, FACTORY_CLASS=UserFactory)
+    user_attributes["first_name"] = "Johnny"
+    another_user_attributes["first_name"] = "Jimmy"
+    del user_attributes["role"]
     
     def setUp(self) -> None:
         super().setUp()
         self.user = self.create(self.user_attributes)
-
+        
     @staticmethod
     def expected_details(entity: dict, attributes: dict):
-        return {**attributes, "id": entity["id"]}
+        return {**attributes,
+                "id": entity["id"],
+                "phone": entity["phone"],
+                }
 
     def test_create(self):
         expected_response = self.expected_details(
-            self.user, self.user_attributes
-            )
+            self.user,
+            self.user_attributes)
 
         assert self.user == expected_response
 
@@ -50,22 +44,21 @@ class TestUserViewSet(TestViewSetBase):
             self.another_user_attributes, key=self.user["id"]
             )
 
-        assert updated_data["first_name"] == "Jim"
+        assert updated_data["first_name"] == "Jimmy"
 
     def test_list(self):
         data = self.list()
 
-        assert len(data) == 3
+        assert len(data) == 1
 
     def test_filter(self):
-        wrong_user = self.create(self.another_user_attributes)
-        data = self.filter({"username": "john"})
+        data = self.filter({"first_name": "John"})
 
         expected_response_match = self.expected_details(
             self.user, self.user_attributes
             )
         expected_response_no_match = self.expected_details(
-            wrong_user, self.another_user_attributes
+            self.user, self.another_user_attributes
             )
 
         assert expected_response_match in data
