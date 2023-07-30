@@ -4,7 +4,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
 from main.models import Tag, Task
-from test.base import UserFactory, SuperUserFactory
+from test.fixtures.factories.user import UserFactory, SuperUserFactory
 
 
 class TestPerm(APITestCase):

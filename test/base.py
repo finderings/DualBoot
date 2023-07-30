@@ -1,52 +1,32 @@
 from http import HTTPStatus
 from typing import List, Union
 
+from requests import Response
+
 from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
-from main.models import User
-from factory.django import DjangoModelFactory
-from factory import PostGenerationMethodCall, Faker
-
-
-class UserFactory(DjangoModelFactory):
-    username = Faker("user_name")
-    password = PostGenerationMethodCall("set_password", "password")
-
-    class Meta:
-        model = User
-
-
-class SuperUserFactory(UserFactory):
-    is_staff = True
+from .fixtures.factories.user import SuperUserFactory
 
 
 class TestViewSetBase(APITestCase):
-    user: UserFactory = None
+    user: SuperUserFactory = None
     client: APIClient = None
     basename: str
-    token_url = reverse("token_obtain_pair")
-    refresh_token_url = reverse("token_refresh")
 
     @classmethod
     def setUpTestData(cls) -> None:
         super().setUpTestData()
-        cls.user = cls.create_api_user()
         cls.admin = cls.create_api_admin()
         cls.client = APIClient()
 
     def setUp(self) -> None:
         super().setUp()
-        token = self.token_request(self.user.username)
-        self.client.force_authenticate(user=self.admin, token=token)
-
-    @classmethod
-    def create_api_user(cls):
-        return UserFactory.create()
+        self.client.force_authenticate(user=self.admin)
 
     @classmethod
     def create_api_admin(cls):
-        return SuperUserFactory.create()
+        return SuperUserFactory.build()
 
     @classmethod
     def detail_url(cls, key: Union[int, str]) -> str:
@@ -55,34 +35,62 @@ class TestViewSetBase(APITestCase):
     @classmethod
     def list_url(cls, args: List[Union[str, int]] = None) -> str:
         return reverse(f"{cls.basename}-list", args=args)
+    
+    def request_create(
+        self, data: dict, args: List[Union[str, int]] = None
+    ) -> Response:
+        url = self.list_url(args)
+        return self.client.post(url, data=data)
 
     def create(self, data: dict, args: List[Union[str, int]] = None) -> dict:
-        response = self.client.post(self.list_url(args), data=data)
+        response = self.request_create(data, args)
         assert response.status_code == HTTPStatus.CREATED, response.content
         return response.data
+    
+    def request_list(self, arg: List[Union[str, int]] = None) -> Response:
+        url = self.list_url(arg)
+        return self.client.get(url)
 
     def list(self, arg: List[Union[str, int]] = None) -> dict:
-        response = self.client.get(self.list_url(arg))
+        response = self.request_list(arg)
         assert response.status_code == HTTPStatus.OK, response.content
         return response.data
+    
+    def request_retrieve(self, key: Union[str, int]) -> Response:
+        url = self.detail_url(key)
+        return self.client.get(url)
 
     def retrieve(self, key: Union[str, int]) -> dict:
-        response = self.client.get(self.detail_url(key))
+        response = self.request_retrieve(key)
         assert response.status_code == HTTPStatus.OK, response.content
         return response.data
+    
+    def request_update(self, data: dict, key: Union[str, int]) -> Response:
+        url = self.detail_url(key)
+        return self.client.put(url, data=data)
 
     def update(self, data: dict, key: Union[str, int]) -> dict:
-        response = self.client.put(self.detail_url(key), data=data)
+        response = self.request_update(data, key)
         assert response.status_code == HTTPStatus.OK, response.content
         return response.data
+    
+    def request_delete(self, key: Union[str, int]) -> Response:
+        url = self.detail_url(key)
+        return self.client.delete(url)
 
     def delete(self, key: Union[str, int]) -> None:
-        response = self.client.delete(self.detail_url(key))
+        response = self.request_delete(key)
         assert response.status_code == HTTPStatus.NO_CONTENT, response.content
         return response.data
+    
+    def request_filter(
+            self, data: dict, args: List[Union[str, int]] = None
+    ) -> Response:
+        url = self.list_url(args)
+        return self.client.get(url, data=data)
 
     def filter(self, data: dict, args: List[Union[str, int]] = None) -> dict:
-        response = self.client.get(self.list_url(args), data=data)
+        response = self.request_filter(data, args)
         assert response.status_code == HTTPStatus.OK, response.content
         return response.data
 
@@ -91,21 +99,3 @@ class TestViewSetBase(APITestCase):
         response = self.client.get(self.detail_url(key))
         assert response.status_code == HTTPStatus.UNAUTHORIZED
         return response.data
-
-    def token_request(self, username: str = None, password: str = "password"):
-        client = self.client_class()
-        if not username:
-            username = self.create_api_user().username
-        return client.post(
-            self.token_url, data={"username": username, "password": password}
-            )
-
-    def refresh_token_request(self, refresh_token: str):
-        client = self.client_class()
-        return client.post(
-            self.refresh_token_url, data={"refresh": refresh_token}
-            )
-
-    def get_refresh_token(self):
-        response = self.token_request()
-        return response.json()["refresh"]

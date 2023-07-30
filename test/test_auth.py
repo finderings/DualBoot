@@ -1,15 +1,51 @@
 from http import HTTPStatus
 
-from test.base import TestViewSetBase
+from factory import PostGenerationMethodCall, Faker
+from factory.django import DjangoModelFactory
 
 from django.urls import reverse
+from rest_framework.test import APITestCase
 
 from freezegun import freeze_time
 from datetime import timedelta
 
+from main.models import User
 
-class TestJWTAuth(TestViewSetBase):
+
+class UserFactory(DjangoModelFactory):
+    username = Faker("user_name")
+    password = PostGenerationMethodCall("set_password", "password")
+
+    class Meta:
+        model = User
+
+
+class TestJWTAuth(APITestCase):
     any_api_url = reverse("users-list")
+    token_url = reverse("token_obtain_pair")
+    refresh_token_url = reverse("token_refresh")
+
+    @staticmethod
+    def create_user() -> User:
+        return UserFactory.create()
+
+    def token_request(self, username: str = None, password: str = "password"):
+        client = self.client_class()
+        if not username:
+            username = self.create_user().username
+        return client.post(
+            self.token_url, data={"username": username, "password": password}
+            )
+
+    def refresh_token_request(self, refresh_token: str):
+        client = self.client_class()
+        return client.post(
+            self.refresh_token_url, data={"refresh": refresh_token}
+            )
+
+    def get_refresh_token(self):
+        response = self.token_request()
+        return response.json()["refresh"]
 
     def test_successful_auth(self):
         response = self.token_request()

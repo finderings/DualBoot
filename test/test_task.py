@@ -1,33 +1,17 @@
 from test.base import TestViewSetBase
-from main.models import Tag, User
+import factory
+from test.fixtures.factories.task import TaskFactory
 
 
 class TestTaskViewSet(TestViewSetBase):
     basename = "tasks"
+    task_attributes = factory.build(dict, FACTORY_CLASS=TaskFactory)
+    another_task_attributes = factory.build(dict, FACTORY_CLASS=TaskFactory)
+    task_attributes["title"] = "test_title"
+    another_task_attributes["title"] = "new_title"
 
     def setUp(self) -> None:
         super().setUp()
-        self.tag = Tag.objects.create(title="test_tag")
-        self.author = User.objects.create(username="user1")
-        self.performer = User.objects.create(username="user2")
-        self.task_attributes = {
-            "title": "test_task",
-            "description": "description",
-            "priority": "high",
-            "final_date": "2025-05-05",
-            "author": self.author.id,
-            "performer": self.performer.id,
-            "tags": [self.tag.id],
-        }
-        self.another_task_attributes = {
-            "title": "new_title",
-            "description": "new_description",
-            "priority": "low",
-            "final_date": "2025-05-05",
-            "author": self.author.id,
-            "performer": self.performer.id,
-            "tags": [self.tag.id],
-        }
         self.task = self.create(self.task_attributes)
 
     @staticmethod
@@ -79,14 +63,13 @@ class TestTaskViewSet(TestViewSetBase):
         assert len(data) == 2
 
     def test_filter(self):
-        wrong_task = self.create(self.another_task_attributes)
         data = self.filter({"title": "test"})
 
         expected_response_match = self.expected_details(
             self.task, self.task_attributes
             )
         expected_response_no_match = self.expected_details(
-            wrong_task, self.another_task_attributes
+            self.task, self.another_task_attributes
         )
 
         assert expected_response_match in data
