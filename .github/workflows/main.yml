@@ -19,6 +19,6 @@ jobs:
         env:
           COVERAGE: true
           RAILS_ENV: test
-        run: docker-compose --file docker-compose.ci.yml run --rm api make test
+        run: docker-compose --file docker-compose.ci.yml run --rm api make test -B
       - name: Coveralls Send
         run: docker-compose --file docker-compose.ci.yml run --rm -e COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }} api coveralls
