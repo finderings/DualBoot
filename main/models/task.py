@@ -26,13 +26,13 @@ class Task(models.Model):
         User,
         on_delete=models.DO_NOTHING,
         related_name="author",
-        null = True
+        null=True
     )
     performer = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
         related_name="performer",
-        null = True
+        null=True
     )
     tags = models.ManyToManyField(Tag)
 
