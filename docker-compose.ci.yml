@@ -11,6 +11,12 @@ x-db-config: &db-config
   DATABASE_HOST: db
   DATABASE_PORT: 5432
   POSTGRES_PASSWORD: pgpassword
+  EMAIL_USE_SSL: 1
+  EMAIL_USE_TLS: 1
+  EMAIL_HOST: smtp.gmail.com
+  EMAIL_HOST_USER: username
+  EMAIL_HOST_PASSWORD: password
+  EMAIL_PORT: 465
 
 services:
   api:
