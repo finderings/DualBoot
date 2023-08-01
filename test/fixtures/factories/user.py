@@ -1,4 +1,5 @@
-from factory import Factory, Faker
+from factory import Faker
+from factory.django import DjangoModelFactory
 
 from main.models import User
 from .base import ImageFileProvider
@@ -7,7 +8,7 @@ from .base import ImageFileProvider
 Faker.add_provider(ImageFileProvider)
 
 
-class UserFactory(Factory):
+class UserFactory(DjangoModelFactory):
     username = Faker("user_name")
     role = Faker("random_element", elements=User.Roles.values)
     email = Faker("email")
