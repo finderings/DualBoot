@@ -26,6 +26,10 @@ services:
       EMAIL_HOST_USER: username
       EMAIL_HOST_PASSWORD: password
       EMAIL_PORT: 465
+      AWS_ACCESS_KEY_ID: key_id
+      AWS_SECRET_ACCESS_KEY: access_key
+      AWS_STORAGE_BUCKET_NAME: name
+      AWS_S3_REGION_NAME: name
     command: newrelic-admin run-program python manage.py runserver 0.0.0.0:8000
 
   db:
