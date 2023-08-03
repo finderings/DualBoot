@@ -15,6 +15,7 @@ class UserFactory(DjangoModelFactory):
     first_name = Faker("first_name")
     last_name = Faker("last_name")
     date_of_birth = Faker("date")
+    avatar_picture = Faker("image_file", fmt="jpeg")
 
     class Meta:
         model = User
