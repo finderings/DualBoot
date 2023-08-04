@@ -99,3 +99,20 @@ class TestViewSetBase(APITestCase):
         response = self.client.get(self.detail_url(key))
         assert response.status_code == HTTPStatus.UNAUTHORIZED
         return response.data
+
+    def request_single_resource(self, data: dict = None) -> Response:
+        return self.client.get(self.list_url(), data=data)
+
+    def single_resource(self, data: dict = None) -> dict:
+        response = self.request_single_resource(data)
+        assert response.status_code == HTTPStatus.OK
+        return response.data
+
+    def request_patch_single_resource(self, attributes: dict) -> Response:
+        url = self.list_url()
+        return self.client.patch(url, data=attributes)
+
+    def patch_single_resource(self, attributes: dict) -> dict:
+        response = self.request_patch_single_resource(attributes)
+        assert response.status_code == HTTPStatus.OK, response.content
+        return response.data
