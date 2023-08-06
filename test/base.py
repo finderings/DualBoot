@@ -29,13 +29,17 @@ class TestViewSetBase(APITestCase):
         return SuperUserFactory.build()
 
     @classmethod
-    def detail_url(cls, key: Union[int, str]) -> str:
-        return reverse(f"{cls.basename}-detail", args=[key])
+    def detail_url(
+        cls, key: Union[Union[int, str], List[Union[int, str]]]
+    ) -> str:
+        return reverse(f"{cls.basename}-detail",
+                       args=key if isinstance(key, list) else [key]
+                       )
 
     @classmethod
     def list_url(cls, args: List[Union[str, int]] = None) -> str:
         return reverse(f"{cls.basename}-list", args=args)
-    
+
     def request_create(
         self, data: dict, args: List[Union[str, int]] = None
     ) -> Response:
@@ -46,52 +50,62 @@ class TestViewSetBase(APITestCase):
         response = self.request_create(data, args)
         assert response.status_code == HTTPStatus.CREATED, response.content
         return response.data
-    
-    def request_list(self, arg: List[Union[str, int]] = None) -> Response:
-        url = self.list_url(arg)
-        return self.client.get(url)
 
-    def list(self, arg: List[Union[str, int]] = None) -> dict:
-        response = self.request_list(arg)
-        assert response.status_code == HTTPStatus.OK, response.content
-        return response.data
-    
-    def request_retrieve(self, key: Union[str, int]) -> Response:
-        url = self.detail_url(key)
-        return self.client.get(url)
-
-    def retrieve(self, key: Union[str, int]) -> dict:
-        response = self.request_retrieve(key)
-        assert response.status_code == HTTPStatus.OK, response.content
-        return response.data
-    
-    def request_update(self, data: dict, key: Union[str, int]) -> Response:
-        url = self.detail_url(key)
-        return self.client.put(url, data=data)
-
-    def update(self, data: dict, key: Union[str, int]) -> dict:
-        response = self.request_update(data, key)
-        assert response.status_code == HTTPStatus.OK, response.content
-        return response.data
-    
-    def request_delete(self, key: Union[str, int]) -> Response:
-        url = self.detail_url(key)
-        return self.client.delete(url)
-
-    def delete(self, key: Union[str, int]) -> None:
-        response = self.request_delete(key)
-        assert response.status_code == HTTPStatus.NO_CONTENT, response.content
-        return response.data
-    
-    def request_filter(
-            self, data: dict, args: List[Union[str, int]] = None
+    def request_list(
+        self, data: dict = None, args: List[Union[str, int]] = None
     ) -> Response:
         url = self.list_url(args)
         return self.client.get(url, data=data)
 
-    def filter(self, data: dict, args: List[Union[str, int]] = None) -> dict:
-        response = self.request_filter(data, args)
+    def list(
+            self, data: dict = None, args: List[Union[str, int]] = None
+            ) -> dict:
+        response = self.request_list(data, args)
         assert response.status_code == HTTPStatus.OK, response.content
+        return response.data
+
+    def request_retrieve(
+        self,
+        data: dict = None,
+        key: Union[Union[int, str], List[Union[int, str]]] = None
+    ) -> Response:
+        url = self.detail_url(key)
+        return self.client.get(url, data=data)
+
+    def retrieve(self,
+                 data: dict,
+                 key: Union[Union[int, str], List[Union[int, str]]] = None
+                 ) -> dict:
+        response = self.request_retrieve(data, key=key)
+        assert response.status_code == HTTPStatus.OK, response.content
+        return response.data
+
+    def request_update(self,
+                       data: dict = None,
+                       key: Union[Union[int, str], List[Union[int, str]]] = None
+                       ) -> Response:
+        url = self.detail_url(key)
+        return self.client.put(url, data=data)
+
+    def update(self,
+               data: dict = None,
+               key: Union[Union[int, str], List[Union[int, str]]] = None
+               ) -> dict:
+        response = self.request_update(data, key)
+        assert response.status_code == HTTPStatus.OK, response.content
+        return response.data
+
+    def request_delete(
+            self, key: Union[Union[int, str], List[Union[int, str]]]
+            ) -> Response:
+        url = self.detail_url(key)
+        return self.client.delete(url)
+
+    def delete(
+            self, key: Union[Union[int, str], List[Union[int, str]]]
+            ) -> None:
+        response = self.request_delete(key)
+        assert response.status_code == HTTPStatus.NO_CONTENT, response.content
         return response.data
 
     def check_authorization(self, key: Union[str, int]) -> None:
