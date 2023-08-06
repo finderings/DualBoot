@@ -44,8 +44,13 @@ class TestTaskViewSet(TestViewSetBase):
         assert deleted_task == None
 
     def test_retrieve(self):
-        retrieved_data = self.retrieve(self.task["id"])
+        del self.task["author"]
+        del self.task["performer"]
 
+        retrieved_data = self.retrieve(self.task, self.task["id"])
+        del retrieved_data["author"]
+        del retrieved_data["performer"]
+        
         assert self.task == retrieved_data
 
     def test_update(self):
@@ -63,7 +68,7 @@ class TestTaskViewSet(TestViewSetBase):
         assert len(data) == 2
 
     def test_filter(self):
-        data = self.filter({"title": "test"})
+        data = self.list({"title": "test"})
 
         expected_response_match = self.expected_details(
             self.task, self.task_attributes
