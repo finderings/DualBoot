@@ -6,12 +6,12 @@ from .user import UserFactory
 
 
 class TaskFactory(DjangoModelFactory):
-    title = Faker("text")
-    description = Faker("text")
+    title = Faker("text", max_nb_chars=7)
+    description = Faker("text", max_nb_chars=7)
     author = SubFactory(UserFactory)
     performer = SubFactory(UserFactory)
     final_date = Faker("date")
-    priority = Faker("text")
+    priority = Faker("text", max_nb_chars=7)
 
     class Meta:
         model = Task
