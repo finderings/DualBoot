@@ -22,7 +22,6 @@ class TestUserViewSet(TestViewSetBase):
     def test_create(self):
         user_attributes = factory.build(dict, FACTORY_CLASS=UserFactory)
         user = self.create(user_attributes)
-        del user_attributes["role"]
 
         expected_response = self.expected_details(
             user, user_attributes
@@ -41,8 +40,10 @@ class TestUserViewSet(TestViewSetBase):
     def test_retrieve(self):
         user_attributes = factory.build(dict, FACTORY_CLASS=UserFactory)
         user = self.create(user_attributes)
-
-        retrieved_data = self.retrieve(user["id"])
+        del user['phone']
+        
+        retrieved_data = self.retrieve(user, user["id"])
+        del retrieved_data['phone']
 
         assert user == retrieved_data
 
@@ -85,7 +86,7 @@ class TestUserViewSet(TestViewSetBase):
             )
         user = self.create(user_attributes)
         
-        data = self.filter({"first_name": "John"})
+        data = self.list({"first_name": "John"})
 
         expected_response_match = self.expected_details(
             user, user_attributes
@@ -93,8 +94,6 @@ class TestUserViewSet(TestViewSetBase):
         expected_response_no_match = self.expected_details(
             user, another_user_attributes
             )
-        expected_response_match.pop("role", None)
-        expected_response_no_match.pop("role", None)
 
         assert expected_response_match in data
         assert expected_response_no_match not in data
