@@ -1,6 +1,13 @@
 from django.urls import path, include, re_path
 from main.admin import task_manager_admin_site
-from main.views import UserViewSet, TaskViewSet, TagViewSet, CurrentUserViewSet
+from main.views import (
+    UserViewSet,
+    TaskViewSet,
+    TagViewSet,
+    CurrentUserViewSet,
+    UserTasksViewSet,
+    TaskTagsViewSet,
+    )
 from main.services.single_resource import BulkRouter
 
 from rest_framework import permissions
@@ -28,11 +35,27 @@ schema_view = get_schema_view(
 )
 
 
-router = router = BulkRouter()
+router = BulkRouter()
 router.register(r"users", UserViewSet, basename="users")
 router.register(r"tasks", TaskViewSet, basename="tasks")
 router.register(r"tags", TagViewSet, basename="tags")
 router.register(r"current-user", CurrentUserViewSet, basename="current_user")
+
+users = router.register(r"users", UserViewSet, basename="users")
+users.register(
+    r"tasks",
+    UserTasksViewSet,
+    basename="user_tasks",
+    parents_query_lookups=["performer_id"],
+)
+
+tasks = router.register(r"tasks", TaskViewSet, basename="tasks")
+tasks.register(
+    r"tags",
+    TaskTagsViewSet,
+    basename="task_tags",
+    parents_query_lookups=["task_id"],
+)
 
 urlpatterns = [
     path("admin/", task_manager_admin_site.urls),
