@@ -27,7 +27,7 @@ class TestTagViewSet(TestViewSetBase):
         assert deleted_tag == None
 
     def test_retrieve(self):
-        retrieved_data = self.retrieve(self.tag["id"])
+        retrieved_data = self.retrieve(self.tag, self.tag["id"])
 
         assert self.tag == retrieved_data
 
@@ -47,7 +47,7 @@ class TestTagViewSet(TestViewSetBase):
 
     def test_filter(self):
         wrong_tag = self.create(self.another_tag_attributes)
-        data = self.filter({"title": "test"})
+        data = self.list({"title": "test"})
 
         expected_response_match = self.expected_details(
             self.tag, self.tag_attributes
