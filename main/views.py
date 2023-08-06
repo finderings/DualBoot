@@ -12,6 +12,8 @@ from main.services.single_resource import (
     SingleResourceMixin, SingleResourceUpdateMixin
     )
 
+from rest_framework_extensions.mixins import NestedViewSetMixin
+
 
 class UserFilter(django_filters.FilterSet):
     username = django_filters.CharFilter(lookup_expr="icontains")
@@ -79,4 +81,21 @@ class CurrentUserViewSet(
     queryset = User.objects.order_by("id")
 
     def get_object(self) -> User:
-        return cast(User, self.request.user) 
+        return cast(User, self.request.user)
+
+
+class UserTasksViewSet(NestedViewSetMixin, viewsets.ModelViewSet):
+    queryset = (
+        Task.objects.order_by("id")
+        .select_related("author", "performer")
+        .prefetch_related("tags")
+    )
+    serializer_class = TaskSerializer
+
+
+class TaskTagsViewSet(viewsets.ModelViewSet):
+    serializer_class = TagSerializer
+
+    def get_queryset(self):
+        task_id = self.kwargs["parent_lookup_task_id"]
+        return Task.objects.get(pk=task_id).tags.all()
