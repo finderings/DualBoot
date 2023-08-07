@@ -17,6 +17,8 @@ x-db-config: &db-config
   EMAIL_HOST_USER: username
   EMAIL_HOST_PASSWORD: password
   EMAIL_PORT: 465
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
 
 services:
   api:
@@ -40,6 +42,33 @@ services:
       driver: none
     ports:
       - "5432:5432"
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+
+  celery:
+    build: .
+    command: celery --app=task_manager worker --loglevel=info
+    environment:
+      <<: *app-config
+    volumes: 
+      - .:/app
+    depends_on:
+      - redis
+    
+  flower:
+    build: .
+    command: celery --app=task_manager --broker=redis://redis:6379/0 flower --port=5555
+    environment:
+      <<: *app-config
+    volumes: 
+      - .:/app
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis  
 
 volumes:
   sqlvolume:
