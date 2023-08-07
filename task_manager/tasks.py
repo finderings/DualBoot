@@ -10,7 +10,7 @@ from task_manager.celery import app
 def send_assign_notification(task_id: int) -> None:
     task = Task.objects.get(pk=task_id)
     performer = task.performer
-    send_html_email.delay(
+    send_html_email(
         subject="You've assigned a task.",
         template="notification.html",
         context={"task": task},
