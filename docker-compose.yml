@@ -12,6 +12,8 @@ services:
     depends_on:
       - db
       - agent
+      - celery
+      - redis
     environment: &api-environment
       DJANGO_ENV: dev
       DJANGO_SECRET_KEY: secret_key
@@ -30,6 +32,8 @@ services:
       AWS_SECRET_ACCESS_KEY: access_key
       AWS_STORAGE_BUCKET_NAME: name
       AWS_S3_REGION_NAME: name
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     command: newrelic-admin run-program python manage.py runserver 0.0.0.0:8000
 
   db:
@@ -54,3 +58,18 @@ services:
     environment:
       NRIA_LICENSE_KEY: eu01xxf50860d50d2c3cf38b2cebccf322beNRAL
     restart: unless-stopped
+
+  redis:
+    image: redis:6-alpine
+    ports:
+    - "6379:6379"
+
+  celery:
+    build: .
+    command: celery --app=task_manager worker --loglevel=info
+    environment:
+      <<: *api-environment
+    volumes: 
+      - .:/app
+    depends_on:
+      - redis
