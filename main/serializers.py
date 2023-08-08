@@ -1,12 +1,14 @@
 from rest_framework import serializers
+from typing import Any
 
 from .models import User, Tag, Task
+from task_manager import settings
+from task_manager.tasks import countdown
 
 from django.core.files.base import File
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
-
-from task_manager import settings
+from celery.result import AsyncResult
 
 
 class FileMaxSizeValidator:
@@ -53,3 +55,21 @@ class TaskSerializer(serializers.ModelSerializer):
             'date_changed', 'final_date', 'status',
             'priority', 'author', 'performer', 'tags'
         )
+
+
+class RepresentationSerializer(serializers.Serializer):
+    def update(self, instance: Any, validated_data: dict) -> Any:
+        pass
+
+    def create(self, validated_data: dict) -> Any:
+        pass
+
+
+class CountdownJobSerializer(RepresentationSerializer):
+    seconds = serializers.IntegerField(write_only=True)
+
+    task_id = serializers.CharField(read_only=True)
+    status = serializers.CharField(read_only=True)
+
+    def create(self, validated_data: dict) -> AsyncResult:
+        return countdown.delay(**validated_data)
