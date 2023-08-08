@@ -1,5 +1,4 @@
 import django_filters
-from requests import Response, Request
 
 from typing import Any, cast
 
@@ -8,12 +7,13 @@ from rest_framework import (
     permissions,
     status,
 )
-from rest_framework.response import Http404, HttpResponse
-from rest_framework_extensions.mixins import (
-    NestedViewSetMixin,
-    CreateModelMixin,
-)
-from django.urls import reverse
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework_extensions.mixins import NestedViewSetMixin
+from rest_framework.mixins import CreateModelMixin
+
+from rest_framework.reverse import reverse
+from django.http import Http404, HttpResponse
 
 from main import serializers
 from main.services.single_resource import (
