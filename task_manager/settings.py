@@ -55,7 +55,34 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "rollbar.contrib.django.middleware.RollbarNotifierMiddleware",
+    "task_manager.log_utils.LoggingMiddleware",
 ]
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "task_manager": {
+            "()": "task_manager.log_utils.RequestFormatter",
+            "format": (
+                "{asctime} {levelname} method={request.method} path={request.path_info}"
+                "view={view.__qualname__} user={user_id} {message} remote={remote_addr} {message}"
+                " processing_time={processing_time:.4f} seconds"
+            ),
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "formatter": "task_manager",
+            "class": "logging.StreamHandler",
+        }
+    },
+    "loggers": {
+        "django.server": {"level": "INFO", "handlers": ["console"]},
+    }
+}
 
 ROOT_URLCONF = "task_manager.urls"
 
