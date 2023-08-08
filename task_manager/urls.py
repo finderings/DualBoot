@@ -1,25 +1,20 @@
-from django.urls import path, include, re_path
+from django.urls import (
+    path,
+    include,
+    re_path,
+)
+
+from main import views
 from main.admin import task_manager_admin_site
-from main.views import (
-    UserViewSet,
-    TaskViewSet,
-    TagViewSet,
-    CurrentUserViewSet,
-    UserTasksViewSet,
-    TaskTagsViewSet,
-    CountdownJobViewSet,
-    )
 from main.services.single_resource import BulkRouter
 
 from rest_framework import permissions
-
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
-
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
 
 schema_view = get_schema_view(
@@ -37,24 +32,27 @@ schema_view = get_schema_view(
 
 
 router = BulkRouter()
-router.register(r"users", UserViewSet, basename="users")
-router.register(r"tasks", TaskViewSet, basename="tasks")
-router.register(r"tags", TagViewSet, basename="tags")
-router.register(r"current-user", CurrentUserViewSet, basename="current_user")
-router.register(r"countdown", CountdownJobViewSet, basename="countdown")
+router.register(r"users", views.UserViewSet, basename="users")
+router.register(r"tasks", views.TaskViewSet, basename="tasks")
+router.register(r"tags", views.TagViewSet, basename="tags")
+router.register(
+    r"current-user", views.CurrentUserViewSet, basename="current_user"
+    )
+router.register(r"countdown", views.CountdownJobViewSet, basename="countdown")
+router.register(r"jobs", views.AsyncJobViewSet, basename="jobs")
 
-users = router.register(r"users", UserViewSet, basename="users")
+users = router.register(r"users", views.UserViewSet, basename="users")
 users.register(
     r"tasks",
-    UserTasksViewSet,
+    views.UserTasksViewSet,
     basename="user_tasks",
     parents_query_lookups=["performer_id"],
 )
 
-tasks = router.register(r"tasks", TaskViewSet, basename="tasks")
+tasks = router.register(r"tasks", views.TaskViewSet, basename="tasks")
 tasks.register(
     r"tags",
-    TaskTagsViewSet,
+    views.TaskTagsViewSet,
     basename="task_tags",
     parents_query_lookups=["task_id"],
 )
