@@ -7,6 +7,7 @@ from main.views import (
     CurrentUserViewSet,
     UserTasksViewSet,
     TaskTagsViewSet,
+    CountdownJobViewSet,
     )
 from main.services.single_resource import BulkRouter
 
@@ -40,6 +41,7 @@ router.register(r"users", UserViewSet, basename="users")
 router.register(r"tasks", TaskViewSet, basename="tasks")
 router.register(r"tags", TagViewSet, basename="tags")
 router.register(r"current-user", CurrentUserViewSet, basename="current_user")
+router.register(r"countdown", CountdownJobViewSet, basename="countdown")
 
 users = router.register(r"users", UserViewSet, basename="users")
 users.register(
