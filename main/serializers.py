@@ -73,3 +73,16 @@ class CountdownJobSerializer(RepresentationSerializer):
 
     def create(self, validated_data: dict) -> AsyncResult:
         return countdown.delay(**validated_data)
+
+
+class ErrorSerializer(RepresentationSerializer):
+    non_field_errors: serializers.ListSerializer = serializers.ListSerializer(
+        child=serializers.CharField()
+    )
+
+
+class JobSerializer(RepresentationSerializer):
+    task_id = serializers.CharField(read_only=True)
+    status = serializers.CharField(read_only=True)
+    errors = ErrorSerializer(read_only=True, required=False)
+    result = serializers.CharField(required=False)
