@@ -5,14 +5,22 @@ from rest_framework import viewsets, permissions
 from typing import cast
 
 from .models import Task, Tag, User
-from .serializers import UserSerializer, TagSerializer, TaskSerializer
+from .serializers import (
+    UserSerializer,
+    TagSerializer,
+    TaskSerializer,
+    CountdownJobSerializer,
+    )
 from .permissions import IsStaffDelete
 
+from django.urls import reverse
 from main.services.single_resource import (
     SingleResourceMixin, SingleResourceUpdateMixin
     )
 
-from rest_framework_extensions.mixins import NestedViewSetMixin
+from rest_framework_extensions.mixins import (
+    NestedViewSetMixin, CreateModelMixin
+    )
 
 
 class UserFilter(django_filters.FilterSet):
@@ -99,3 +107,11 @@ class TaskTagsViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         task_id = self.kwargs["parent_lookup_task_id"]
         return Task.objects.get(pk=task_id).tags.all()
+
+
+class CountdownJobViewSet(CreateModelMixin, viewsets.GenericViewSet):
+    serializer_class = CountdownJobSerializer
+
+    def get_success_headers(self, data: dict) -> dict[str, str]:
+        task_id = data["task_id"]
+        return {"Location": reverse("jobs-detail", args=[task_id])}
